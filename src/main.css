@@ -26,9 +26,16 @@ img {
   max-width: 200px;
 }
 
+.Adjustors {
+  margin-bottom: 1rem;
+}
+
 .Frame {
+  width: fit-content;
+  margin: 0 auto;
   border: 2px solid black;
 }
+
 .Row {
   display: flex;
 }

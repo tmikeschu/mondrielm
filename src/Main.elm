@@ -1,21 +1,35 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (Html, div, h1, img, text)
+import Html exposing (Html, button, div, h1, img, text)
 import Html.Attributes exposing (class, src, style)
+import Html.Events exposing (onClick)
 import Random
 
 
 
----- Step 1: random square ----
 ---- MODEL ----
----- TODO: whimsical vim ----
--- random hex value
--- takes dimensions of square and the atomic dimension (one square)
 
 
 type alias Model =
-    List (List Color)
+    { canvas : List (List Color)
+    , height : Int
+    , width : Int
+    }
+
+
+type alias Height =
+    Int
+
+
+type alias Width =
+    Int
+
+
+type CanvasElement
+    = Box Height Width
+    | VerticalRow
+    | HorizontalRow
 
 
 type Color
@@ -45,14 +59,13 @@ colorToString c =
             "#ffffff"
 
 
-
--- start 10 by 10, atomic dimension 1rem
-
-
 init : ( Model, Cmd Msg )
 init =
-    ( []
-    , newCanvas
+    ( { canvas = []
+      , height = 50
+      , width = 50
+      }
+    , newCanvas 50 50
     )
 
 
@@ -63,28 +76,46 @@ init =
 type Msg
     = NoOp
     | NewCanvas (List (List Color))
+    | ChangeHeight Height
+    | ChangeWidth Width
+    | SetSquare
 
 
-randomRow : Random.Generator (List Color)
-randomRow =
-    Random.list 10 (Random.uniform Black [ Blue, Red, Yellow, White ])
+randomRow : Width -> Random.Generator (List Color)
+randomRow w =
+    Random.list w (Random.uniform Black [ Blue, Red, Yellow, White ])
 
 
-randomCanvas : Random.Generator (List (List Color))
-randomCanvas =
-    Random.list 10 randomRow
+randomCanvas : Height -> Width -> Random.Generator (List (List Color))
+randomCanvas h w =
+    Random.list h <| randomRow w
 
 
-newCanvas : Cmd Msg
-newCanvas =
-    Random.generate NewCanvas randomCanvas
+newCanvas : Height -> Width -> Cmd Msg
+newCanvas h w =
+    Random.generate NewCanvas (randomCanvas h w)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NewCanvas rows ->
-            ( rows, Cmd.none )
+        NewCanvas canvas ->
+            ( { model | canvas = canvas }, Cmd.none )
+
+        ChangeHeight h ->
+            ( { model | height = model.height + h }, newCanvas (model.height + h) model.width )
+
+        ChangeWidth w ->
+            ( { model | width = model.width + w }, newCanvas model.height (model.width + w) )
+
+        SetSquare ->
+            let
+                smaller =
+                    min model.width model.height
+            in
+            ( { model | width = smaller, height = smaller }
+            , newCanvas smaller smaller
+            )
 
         _ ->
             ( model, Cmd.none )
@@ -108,15 +139,22 @@ makeCell c =
 
 
 makeRow : List Color -> Html Msg
-makeRow r =
-    div [ class "Row" ] <| List.map makeCell r
+makeRow =
+    List.map makeCell >> div [ class "Row" ]
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Mondrian!" ]
-        , div [ class "Frame" ] <| List.map makeRow model
+        [ h1 [] [ text "MondriElm!" ]
+        , div [ class "Adjustors" ]
+            [ button [ onClick <| ChangeHeight 5 ] [ text "Height +" ]
+            , button [ onClick <| ChangeHeight -5 ] [ text "Height -" ]
+            , button [ onClick <| ChangeWidth 5 ] [ text "Width +" ]
+            , button [ onClick <| ChangeWidth -5 ] [ text "Width -" ]
+            , button [ onClick <| SetSquare ] [ text "Make Square" ]
+            ]
+        , div [ class "Frame" ] <| List.map makeRow model.canvas
         ]
 
 
