@@ -1,6 +1,8 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
+import Canvas exposing (..)
+import Color exposing (..)
 import Html exposing (Html, button, div, h1, img, text)
 import Html.Attributes exposing (class, src, style)
 import Html.Events exposing (onClick)
@@ -12,7 +14,7 @@ import Random
 
 
 type alias Model =
-    { canvas : List (List Color)
+    { canvas : Canvas
     , height : Height
     , width : Width
     }
@@ -24,33 +26,6 @@ type alias Height =
 
 type alias Width =
     Int
-
-
-type Color
-    = Blue
-    | Red
-    | Yellow
-    | Black
-    | White
-
-
-colorToString : Color -> String
-colorToString c =
-    case c of
-        Blue ->
-            "#3963BA"
-
-        Red ->
-            "#B41907"
-
-        Yellow ->
-            "#EDB023"
-
-        Black ->
-            "#000000"
-
-        White ->
-            "#ffffff"
 
 
 init : ( Model, Cmd Msg )
@@ -69,7 +44,7 @@ init =
 
 type Msg
     = NoOp
-    | NewCanvas (List (List Color))
+    | NewCanvas Canvas
     | ChangeHeight Height
     | ChangeWidth Width
     | SetSquare
@@ -87,7 +62,7 @@ randomRow w =
         )
 
 
-randomCanvas : Height -> Width -> Random.Generator (List (List Color))
+randomCanvas : Height -> Width -> Random.Generator Canvas
 randomCanvas h w =
     Random.list h <| randomRow w
 
@@ -153,7 +128,9 @@ view model =
             , button [ onClick <| ChangeWidth -5 ] [ text "Width -" ]
             , button [ onClick <| SetSquare ] [ text "Make Square" ]
             ]
-        , div [ class "Frame" ] <| List.map makeRow model.canvas
+        , div [ class "Frame" ] <|
+            List.map makeRow <|
+                withHorizontalBorders [ 1, 7 ] Black model.canvas
         ]
 
 
