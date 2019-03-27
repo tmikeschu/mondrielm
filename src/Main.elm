@@ -13,10 +13,19 @@ import Random
 ---- MODEL ----
 
 
+type alias RandomSpread =
+    { canvas : Canvas
+    , horizontalBorders : List Int
+    , verticalBorders : List Int
+    }
+
+
 type alias Model =
     { canvas : Canvas
     , height : Height
     , width : Width
+    , horizontalBorders : List Int
+    , verticalBorders : List Int
     }
 
 
@@ -28,13 +37,20 @@ type alias Width =
     Int
 
 
+initDimension : Int
+initDimension =
+    50
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { canvas = []
-      , height = 50
-      , width = 50
+      , height = initDimension
+      , width = initDimension
+      , horizontalBorders = []
+      , verticalBorders = []
       }
-    , newCanvas 50 50
+    , newSpread initDimension
     )
 
 
@@ -44,6 +60,7 @@ init =
 
 type Msg
     = NoOp
+    | NewSpread RandomSpread
     | NewCanvas Canvas
     | ChangeHeight Height
     | ChangeWidth Width
@@ -67,14 +84,34 @@ randomCanvas h w =
     Random.list h <| randomRow w
 
 
+randomIntList : Random.Generator (List Int)
+randomIntList =
+    Random.list 3 (Random.int 0 10)
+
+
 newCanvas : Height -> Width -> Cmd Msg
 newCanvas h w =
     Random.generate NewCanvas (randomCanvas h w)
 
 
+newSpread : Int -> Cmd Msg
+newSpread dimension =
+    Random.generate NewSpread
+        (Random.map3 RandomSpread (randomCanvas dimension dimension) randomIntList randomIntList)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NewSpread { canvas, horizontalBorders, verticalBorders } ->
+            ( { model
+                | canvas = canvas
+                , horizontalBorders = horizontalBorders
+                , verticalBorders = verticalBorders
+              }
+            , Cmd.none
+            )
+
         NewCanvas canvas ->
             ( { model | canvas = canvas }, Cmd.none )
 
@@ -130,8 +167,8 @@ view model =
             ]
         , div [ class "Frame" ] <|
             List.map makeRow <|
-                withVerticalBorders [ 3, 10 ] Black <|
-                    withHorizontalBorders [ 1, 7 ] Black model.canvas
+                withVerticalBorders model.verticalBorders Black <|
+                    withHorizontalBorders model.horizontalBorders Black model.canvas
         ]
 
 
