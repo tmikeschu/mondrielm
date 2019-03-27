@@ -1,6 +1,6 @@
 module Tests exposing (all)
 
-import Canvas exposing (withHorizontalBorders)
+import Canvas exposing (withHorizontalBorders, withVerticalBorders)
 import Color exposing (..)
 import Expect
 import Test exposing (..)
@@ -12,15 +12,15 @@ import Test exposing (..)
 
 all : Test
 all =
+    let
+        canvas =
+            [ [ Red, White, Yellow ]
+            , [ White, White, Red ]
+            , [ Blue, White, Black ]
+            ]
+    in
     describe "Canvas"
-        [ let
-            canvas =
-                [ [ Red, White, Yellow ]
-                , [ White, White, Red ]
-                , [ Blue, White, Black ]
-                ]
-          in
-          describe "withHorizontalBorders"
+        [ describe "withHorizontalBorders"
             [ test "transforms the specified row to the specified color" <|
                 \_ ->
                     let
@@ -57,6 +57,21 @@ all =
                             [ [ Black, Black, Black ]
                             , [ White, White, Red ]
                             , [ Blue, White, Black ]
+                            ]
+                    in
+                    Expect.equal actual expected
+            ]
+        , describe "withVerticalBorders"
+            [ test "transforms the specified column to the specified color" <|
+                \_ ->
+                    let
+                        actual =
+                            withVerticalBorders [ 1 ] Black canvas
+
+                        expected =
+                            [ [ Red, Black, Yellow ]
+                            , [ White, Black, Red ]
+                            , [ Blue, Black, Black ]
                             ]
                     in
                     Expect.equal actual expected

@@ -1,4 +1,4 @@
-module Canvas exposing (Canvas, withHorizontalBorders)
+module Canvas exposing (Canvas, withHorizontalBorders, withVerticalBorders)
 
 import Color exposing (Color)
 
@@ -18,3 +18,18 @@ withHorizontalBorders rows co =
                 else
                     r
             )
+
+
+withVerticalBorders : List Int -> Color -> Canvas -> Canvas
+withVerticalBorders columns co =
+    List.map
+        (List.indexedMap Tuple.pair
+            >> List.map
+                (\( i, c ) ->
+                    if List.member i columns then
+                        co
+
+                    else
+                        c
+                )
+        )

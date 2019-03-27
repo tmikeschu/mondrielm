@@ -130,7 +130,8 @@ view model =
             ]
         , div [ class "Frame" ] <|
             List.map makeRow <|
-                withHorizontalBorders [ 1, 7 ] Black model.canvas
+                withVerticalBorders [ 3, 10 ] Black <|
+                    withHorizontalBorders [ 1, 7 ] Black model.canvas
         ]
 
 
