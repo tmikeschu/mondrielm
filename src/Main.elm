@@ -26,12 +26,6 @@ type alias Width =
     Int
 
 
-type CanvasElement
-    = Box Height Width
-    | VerticalRow
-    | HorizontalRow
-
-
 type Color
     = Blue
     | Red
@@ -83,7 +77,14 @@ type Msg
 
 randomRow : Width -> Random.Generator (List Color)
 randomRow w =
-    Random.list w (Random.uniform Black [ Blue, Red, Yellow, White ])
+    Random.list w
+        (Random.weighted ( 40, White )
+            [ ( 10, Black )
+            , ( 10, Red )
+            , ( 10, Yellow )
+            , ( 10, Blue )
+            ]
+        )
 
 
 randomCanvas : Height -> Width -> Random.Generator (List (List Color))
@@ -131,9 +132,7 @@ makeCell c =
         [ class "Cell"
         , style "background-color" (colorToString c)
         , style "width" "1rem"
-        , style
-            "height"
-            "1rem"
+        , style "height" "1rem"
         ]
         []
 
