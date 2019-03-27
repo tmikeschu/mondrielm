@@ -39,3 +39,7 @@ img {
 .Row {
   display: flex;
 }
+
+button {
+  font-size: 1rem;
+}
