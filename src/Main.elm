@@ -13,8 +13,8 @@ import Random
 
 type alias Model =
     { canvas : List (List Color)
-    , height : Int
-    , width : Int
+    , height : Height
+    , width : Width
     }
 
 
