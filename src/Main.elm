@@ -185,9 +185,10 @@ view model =
             List.map makeRow <|
                 withVerticalBorders model.verticalBorders Black <|
                     withHorizontalBorders model.horizontalBorders Black <|
-                        withBox { height = 15, width = 10 } ( 10, 40 ) Yellow <|
-                            withBox { height = 10, width = 4 } ( 3, 10 ) Red <|
-                                model.canvas
+                        withBox { height = 20, width = 20 } ( 30, 0 ) Blue <|
+                            withBox { height = 15, width = 10 } ( 10, 40 ) Yellow <|
+                                withBox { height = 10, width = 4 } ( 3, 10 ) Red <|
+                                    model.canvas
         ]
 
 
