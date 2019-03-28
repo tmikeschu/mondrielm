@@ -184,7 +184,10 @@ view model =
         , div [ class "Frame" ] <|
             List.map makeRow <|
                 withVerticalBorders model.verticalBorders Black <|
-                    withHorizontalBorders model.horizontalBorders Black model.canvas
+                    withHorizontalBorders model.horizontalBorders Black <|
+                        withBox { height = 15, width = 10 } ( 10, 40 ) Yellow <|
+                            withBox { height = 10, width = 4 } ( 3, 10 ) Red <|
+                                model.canvas
         ]
 
 
