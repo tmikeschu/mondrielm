@@ -65,6 +65,7 @@ type Msg
     | ChangeHeight Height
     | ChangeWidth Width
     | SetSquare
+    | Scramble
 
 
 randomRow : Width -> Random.Generator (List Color)
@@ -84,9 +85,16 @@ randomCanvas h w =
     Random.list h <| randomRow w
 
 
-randomIntList : Random.Generator (List Int)
-randomIntList =
-    Random.list 3 (Random.int 0 10)
+randomIntList : Int -> Random.Generator (List Int)
+randomIntList d =
+    Random.int 1 5
+        |> Random.andThen
+            (\len ->
+                Random.list len
+                    (Random.int 0
+                        d
+                    )
+            )
 
 
 newCanvas : Height -> Width -> Cmd Msg
@@ -97,7 +105,7 @@ newCanvas h w =
 newSpread : Int -> Cmd Msg
 newSpread dimension =
     Random.generate NewSpread
-        (Random.map3 RandomSpread (randomCanvas dimension dimension) randomIntList randomIntList)
+        (Random.map3 RandomSpread (randomCanvas dimension dimension) (randomIntList dimension) (randomIntList dimension))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -130,6 +138,13 @@ update msg model =
             , newCanvas smaller smaller
             )
 
+        Scramble ->
+            let
+                smaller =
+                    min model.width model.height
+            in
+            ( model, newSpread smaller )
+
         _ ->
             ( model, Cmd.none )
 
@@ -159,7 +174,8 @@ view model =
     div []
         [ h1 [] [ text "MondriElm!" ]
         , div [ class "Adjustors" ]
-            [ button [ onClick <| ChangeHeight 5 ] [ text "Height +" ]
+            [ button [ onClick <| Scramble ] [ text "Scramble" ]
+            , button [ onClick <| ChangeHeight 5 ] [ text "Height +" ]
             , button [ onClick <| ChangeHeight -5 ] [ text "Height -" ]
             , button [ onClick <| ChangeWidth 5 ] [ text "Width +" ]
             , button [ onClick <| ChangeWidth -5 ] [ text "Width -" ]
