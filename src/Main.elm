@@ -72,7 +72,7 @@ randomRow : Width -> Random.Generator (List Color)
 randomRow w =
     Random.list w
         (Random.weighted ( 40, White )
-            [ ( 10, Black )
+            [ ( 1, Black )
             , ( 10, Red )
             , ( 10, Yellow )
             , ( 10, Blue )
