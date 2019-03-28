@@ -158,8 +158,6 @@ makeCell c =
     div
         [ class "Cell"
         , style "background-color" (colorToString c)
-        , style "width" "1rem"
-        , style "height" "1rem"
         ]
         []
 
@@ -171,15 +169,51 @@ makeRow =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "Main" ]
         [ h1 [] [ text "MondriElm!" ]
         , div [ class "Adjustors" ]
-            [ button [ onClick <| Scramble ] [ text "Scramble" ]
-            , button [ onClick <| ChangeHeight 5 ] [ text "Height +" ]
-            , button [ onClick <| ChangeHeight -5 ] [ text "Height -" ]
-            , button [ onClick <| ChangeWidth 5 ] [ text "Width +" ]
-            , button [ onClick <| ChangeWidth -5 ] [ text "Width -" ]
-            , button [ onClick <| SetSquare ] [ text "Make Square" ]
+            [ button
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Red)
+                , class "Adjustors__adjustor"
+                , onClick <| SetSquare
+                ]
+                [ text "Make Square" ]
+            , button
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Blue)
+                , class "Adjustors__adjustor"
+                , onClick <| Scramble
+                ]
+                [ text "Scramble" ]
+            , button
+                [ style "color" (colorToString Black)
+                , style "background-color" (colorToString Yellow)
+                , class "Adjustors__adjustor"
+                , onClick <| ChangeHeight 5
+                ]
+                [ text "Height +" ]
+            , button
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Red)
+                , class "Adjustors__adjustor"
+                , onClick <| ChangeHeight -5
+                ]
+                [ text "Height -" ]
+            , button
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Blue)
+                , class "Adjustors__adjustor"
+                , onClick <| ChangeWidth 5
+                ]
+                [ text "Width +" ]
+            , button
+                [ style "color" (colorToString Black)
+                , style "background-color" (colorToString Yellow)
+                , class "Adjustors__adjustor"
+                , onClick <| ChangeWidth -5
+                ]
+                [ text "Width -" ]
             ]
         , div [ class "Frame" ] <|
             List.map makeRow <|
