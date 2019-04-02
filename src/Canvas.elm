@@ -6,6 +6,7 @@ module Canvas exposing
     , Height
     , Width
     , getNeighbors
+    , indexed
     , withBlock
     , withHorizontalBorders
     , withVerticalBorders

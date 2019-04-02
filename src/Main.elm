@@ -4,7 +4,7 @@ import Browser
 import Canvas exposing (..)
 import Color exposing (..)
 import Html exposing (Html, button, div, h1, img, text)
-import Html.Attributes exposing (class, src, style)
+import Html.Attributes exposing (class, disabled, src, style)
 import Html.Events exposing (onClick)
 import Random
 
@@ -199,58 +199,56 @@ makeBlocks bs c =
     List.foldl (<|) c (List.map withBlock bs)
 
 
+makeAdjustors : List ( List (Html.Attribute msg), List (Html msg) ) -> List (Html msg)
+makeAdjustors =
+    let
+        colors =
+            [ ( Blue, White ), ( Red, White ), ( Yellow, Black ) ]
+    in
+    indexed
+        >> List.map
+            (\( i, data ) ->
+                case data of
+                    ( [], [] ) ->
+                        text ""
+
+                    ( attrs, v ) ->
+                        let
+                            ( bg, color ) =
+                                colors
+                                    |> List.drop (modBy (List.length colors) i)
+                                    |> List.head
+                                    |> Maybe.withDefault ( White, Black )
+                        in
+                        button
+                            (attrs
+                                ++ [ style "color" (colorToString color)
+                                   , style "background-color" (colorToString bg)
+                                   , class "Adjustors__adjustor"
+                                   ]
+                            )
+                            v
+            )
+
+
 view : Model -> Html Msg
 view model =
     div [ class "Main" ]
         [ h1 [] [ text "MondriElm!" ]
         , div [ class "Adjustors" ]
-            [ button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Red)
-                , class "Adjustors__adjustor"
-                , onClick <| Scramble
-                ]
-                [ text "Scramble" ]
-            , button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Blue)
-                , class "Adjustors__adjustor"
-                , onClick <| ChangeHeight 5
-                ]
-                [ text "Height +" ]
-            , button
-                [ style "color" (colorToString Black)
-                , style "background-color" (colorToString Yellow)
-                , class "Adjustors__adjustor"
-                , onClick <| ChangeHeight -5
-                ]
-                [ text "Height -" ]
-            , button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Red)
-                , class "Adjustors__adjustor"
-                , onClick <| ChangeWidth 5
-                ]
-                [ text "Width +" ]
-            , button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Blue)
-                , class "Adjustors__adjustor"
-                , onClick <| ChangeWidth -5
-                ]
-                [ text "Width -" ]
-            , if model.width /= model.height then
-                button
-                    [ style "color" (colorToString Black)
-                    , style "background-color" (colorToString Yellow)
-                    , class "Adjustors__adjustor"
-                    , onClick <| SetSquare
+            (makeAdjustors
+                [ ( [ onClick Scramble ], [ text "Scramble" ] )
+                , ( [ onClick <| ChangeHeight 5 ], [ text "Height +" ] )
+                , ( [ onClick <| ChangeHeight -5 ], [ text "Height -" ] )
+                , ( [ onClick <| ChangeWidth 5 ], [ text "Width +" ] )
+                , ( [ onClick <| ChangeWidth -5 ], [ text "Width -" ] )
+                , ( [ onClick <| SetSquare
+                    , disabled <| model.width == model.height
                     ]
-                    [ text "Make Square" ]
-
-              else
-                text ""
-            ]
+                  , [ text "Make Square" ]
+                  )
+                ]
+            )
         , div [ class "Frame__outer" ]
             [ div [ class "Frame" ] <|
                 List.map makeRow <|

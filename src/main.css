@@ -54,6 +54,12 @@ img {
 .Adjustors__adjustor:hover {
   cursor: pointer;
 }
+.Adjustors__adjustor:disabled {
+  background-color: grey !important;
+}
+.Adjustors__adjustor:disabled:hover {
+  cursor: inherit;
+}
 
 .Frame__outer {
   flex: 1;
