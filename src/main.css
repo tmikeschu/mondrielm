@@ -51,6 +51,13 @@ img {
   border: 2px solid black;
   padding: 0.5rem 1rem;
 }
+.Adjustors__adjustor:hover {
+  cursor: pointer;
+}
+
+.Frame__outer {
+  flex: 1;
+}
 
 .Frame {
   width: fit-content;

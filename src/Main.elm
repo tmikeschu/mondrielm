@@ -33,7 +33,7 @@ type alias Model =
 
 initDimension : Int
 initDimension =
-    50
+    40
 
 
 init : ( Model, Cmd Msg )
@@ -45,7 +45,7 @@ init =
       , verticalBorders = []
       , blocks = []
       }
-    , newSpread initDimension
+    , newSpread initDimension initDimension
     )
 
 
@@ -127,14 +127,14 @@ newCanvas h w =
     Random.generate NewCanvas (randomCanvas h w)
 
 
-newSpread : Int -> Cmd Msg
-newSpread dimension =
+newSpread : Width -> Height -> Cmd Msg
+newSpread w h =
     Random.generate NewSpread
         (Random.map4 RandomSpread
-            (randomCanvas dimension dimension)
-            (randomInt dimension)
-            (randomInt dimension)
-            (randomBlocks dimension)
+            (randomCanvas w h)
+            (randomInt h)
+            (randomInt w)
+            (randomBlocks (List.maximum [ w, h ] |> Maybe.withDefault 0))
         )
 
 
@@ -166,15 +166,11 @@ update msg model =
                     min model.width model.height
             in
             ( { model | width = smaller, height = smaller }
-            , newCanvas smaller smaller
+            , newSpread smaller smaller
             )
 
         Scramble ->
-            let
-                smaller =
-                    min model.width model.height
-            in
-            ( model, newSpread smaller )
+            ( model, newSpread model.width model.height )
 
         _ ->
             ( model, Cmd.none )
@@ -212,51 +208,57 @@ view model =
                 [ style "color" (colorToString White)
                 , style "background-color" (colorToString Red)
                 , class "Adjustors__adjustor"
-                , onClick <| SetSquare
-                ]
-                [ text "Make Square" ]
-            , button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Blue)
-                , class "Adjustors__adjustor"
                 , onClick <| Scramble
                 ]
                 [ text "Scramble" ]
             , button
-                [ style "color" (colorToString Black)
-                , style "background-color" (colorToString Yellow)
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Blue)
                 , class "Adjustors__adjustor"
                 , onClick <| ChangeHeight 5
                 ]
                 [ text "Height +" ]
             , button
-                [ style "color" (colorToString White)
-                , style "background-color" (colorToString Red)
+                [ style "color" (colorToString Black)
+                , style "background-color" (colorToString Yellow)
                 , class "Adjustors__adjustor"
                 , onClick <| ChangeHeight -5
                 ]
                 [ text "Height -" ]
             , button
                 [ style "color" (colorToString White)
-                , style "background-color" (colorToString Blue)
+                , style "background-color" (colorToString Red)
                 , class "Adjustors__adjustor"
                 , onClick <| ChangeWidth 5
                 ]
                 [ text "Width +" ]
             , button
-                [ style "color" (colorToString Black)
-                , style "background-color" (colorToString Yellow)
+                [ style "color" (colorToString White)
+                , style "background-color" (colorToString Blue)
                 , class "Adjustors__adjustor"
                 , onClick <| ChangeWidth -5
                 ]
                 [ text "Width -" ]
+            , if model.width /= model.height then
+                button
+                    [ style "color" (colorToString Black)
+                    , style "background-color" (colorToString Yellow)
+                    , class "Adjustors__adjustor"
+                    , onClick <| SetSquare
+                    ]
+                    [ text "Make Square" ]
+
+              else
+                text ""
             ]
-        , div [ class "Frame" ] <|
-            List.map makeRow <|
-                withVerticalBorders model.verticalBorders Black <|
-                    withHorizontalBorders model.horizontalBorders Black <|
-                        makeBlocks model.blocks <|
-                            model.canvas
+        , div [ class "Frame__outer" ]
+            [ div [ class "Frame" ] <|
+                List.map makeRow <|
+                    withVerticalBorders model.verticalBorders Black <|
+                        withHorizontalBorders model.horizontalBorders Black <|
+                            makeBlocks model.blocks <|
+                                model.canvas
+            ]
         ]
 
 
