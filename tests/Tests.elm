@@ -3,7 +3,7 @@ module Tests exposing (all)
 import Canvas
     exposing
         ( getNeighbors
-        , withBox
+        , withBlock
         , withHorizontalBorders
         , withVerticalBorders
         )
@@ -98,7 +98,7 @@ all =
                     in
                     Expect.equal (List.sort actual) (List.sort expected)
             ]
-        , describe "withBox"
+        , describe "withBlock"
             [ test "adds a box of specified dimensions and color to the canvas" <|
                 \_ ->
                     let
@@ -110,7 +110,7 @@ all =
                             ]
 
                         actual =
-                            withBox { height = 2, width = 2 } ( 2, 0 ) Red canvas2
+                            withBlock ( ( 2, 0 ), { height = 2, width = 2 }, Red ) canvas2
 
                         expected =
                             [ [ Yellow, Red, Black, White ]

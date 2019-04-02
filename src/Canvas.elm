@@ -1,7 +1,12 @@
 module Canvas exposing
-    ( Canvas
+    ( Block
+    , Canvas
+    , Coord
+    , Dimension
+    , Height
+    , Width
     , getNeighbors
-    , withBox
+    , withBlock
     , withHorizontalBorders
     , withVerticalBorders
     )
@@ -12,6 +17,26 @@ import Set
 
 type alias Canvas =
     List (List Color)
+
+
+type alias Height =
+    Int
+
+
+type alias Width =
+    Int
+
+
+type alias Dimension =
+    { height : Height, width : Width }
+
+
+type alias Coord =
+    ( Int, Int )
+
+
+type alias Block =
+    ( Coord, Dimension, Color )
 
 
 withHorizontalBorders : List Int -> Color -> Canvas -> Canvas
@@ -42,14 +67,6 @@ withVerticalBorders columns co =
         )
 
 
-type alias Dimension =
-    { height : Int, width : Int }
-
-
-type alias Coord =
-    ( Int, Int )
-
-
 getNeighbors : Dimension -> Coord -> List Coord
 getNeighbors { height, width } ( x, y ) =
     let
@@ -68,8 +85,8 @@ getNeighbors { height, width } ( x, y ) =
 -- coord is top left oriented
 
 
-withBox : Dimension -> Coord -> Color -> Canvas -> Canvas
-withBox d coor col ca =
+withBlock : ( Coord, Dimension, Color ) -> Canvas -> Canvas
+withBlock ( coor, d, col ) ca =
     ca
         |> indexed
         |> List.map

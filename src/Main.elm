@@ -17,6 +17,7 @@ type alias RandomSpread =
     { canvas : Canvas
     , horizontalBorders : List Int
     , verticalBorders : List Int
+    , blocks : List Block
     }
 
 
@@ -26,15 +27,8 @@ type alias Model =
     , width : Width
     , horizontalBorders : List Int
     , verticalBorders : List Int
+    , blocks : List Block
     }
-
-
-type alias Height =
-    Int
-
-
-type alias Width =
-    Int
 
 
 initDimension : Int
@@ -49,6 +43,7 @@ init =
       , width = initDimension
       , horizontalBorders = []
       , verticalBorders = []
+      , blocks = []
       }
     , newSpread initDimension
     )
@@ -68,6 +63,16 @@ type Msg
     | Scramble
 
 
+zeroTo : Int -> Random.Generator Int
+zeroTo max =
+    Random.int 0 max
+
+
+randomPrimaryColor : Random.Generator Color
+randomPrimaryColor =
+    Random.uniform Blue [ Red, Yellow ]
+
+
 randomRow : Width -> Random.Generator (List Color)
 randomRow w =
     Random.list w
@@ -85,14 +90,34 @@ randomCanvas h w =
     Random.list h <| randomRow w
 
 
-randomIntList : Int -> Random.Generator (List Int)
-randomIntList d =
+randomInt : Int -> Random.Generator (List Int)
+randomInt d =
     Random.int 1 5
+        |> Random.andThen
+            (\len -> Random.list len (zeroTo d))
+
+
+randomBlocks : Int -> Random.Generator (List Block)
+randomBlocks d =
+    let
+        toBlock xy w h c =
+            ( xy, { width = w, height = h }, c )
+
+        fullRange =
+            zeroTo d
+
+        halfRange =
+            zeroTo (d // 2)
+    in
+    Random.int 1 10
         |> Random.andThen
             (\len ->
                 Random.list len
-                    (Random.int 0
-                        d
+                    (Random.map4 toBlock
+                        (Random.pair fullRange fullRange)
+                        halfRange
+                        halfRange
+                        randomPrimaryColor
                     )
             )
 
@@ -105,17 +130,23 @@ newCanvas h w =
 newSpread : Int -> Cmd Msg
 newSpread dimension =
     Random.generate NewSpread
-        (Random.map3 RandomSpread (randomCanvas dimension dimension) (randomIntList dimension) (randomIntList dimension))
+        (Random.map4 RandomSpread
+            (randomCanvas dimension dimension)
+            (randomInt dimension)
+            (randomInt dimension)
+            (randomBlocks dimension)
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NewSpread { canvas, horizontalBorders, verticalBorders } ->
+        NewSpread { canvas, horizontalBorders, verticalBorders, blocks } ->
             ( { model
                 | canvas = canvas
                 , horizontalBorders = horizontalBorders
                 , verticalBorders = verticalBorders
+                , blocks = blocks
               }
             , Cmd.none
             )
@@ -165,6 +196,11 @@ makeCell c =
 makeRow : List Color -> Html Msg
 makeRow =
     List.map makeCell >> div [ class "Row" ]
+
+
+makeBlocks : List Block -> Canvas -> Canvas
+makeBlocks bs c =
+    List.foldl (<|) c (List.map withBlock bs)
 
 
 view : Model -> Html Msg
@@ -219,10 +255,8 @@ view model =
             List.map makeRow <|
                 withVerticalBorders model.verticalBorders Black <|
                     withHorizontalBorders model.horizontalBorders Black <|
-                        withBox { height = 20, width = 20 } ( 30, 0 ) Blue <|
-                            withBox { height = 15, width = 10 } ( 10, 40 ) Yellow <|
-                                withBox { height = 10, width = 4 } ( 3, 10 ) Red <|
-                                    model.canvas
+                        makeBlocks model.blocks <|
+                            model.canvas
         ]
 
 
