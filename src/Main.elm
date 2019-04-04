@@ -155,10 +155,18 @@ update msg model =
             ( { model | canvas = canvas }, Cmd.none )
 
         ChangeHeight h ->
-            ( { model | height = model.height + h }, newCanvas (model.height + h) model.width )
+            let
+                newH =
+                    max 10 (model.height + h)
+            in
+            ( { model | height = newH }, newCanvas newH model.width )
 
         ChangeWidth w ->
-            ( { model | width = model.width + w }, newCanvas model.height (model.width + w) )
+            let
+                newW =
+                    max 10 (model.width + w)
+            in
+            ( { model | width = newW }, newCanvas model.height newW )
 
         SetSquare ->
             let
