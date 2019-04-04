@@ -74,8 +74,8 @@ img {
 }
 
 .Cell {
-  height: 1rem;
-  width: 1rem;
+  height: 1vw;
+  width: 1vw;
 }
 
 .Row {
@@ -84,6 +84,7 @@ img {
 
 button {
   font-size: 1rem;
+  touch-action: manipulation;
 }
 
 @media (max-width: 600px) {
