@@ -247,9 +247,17 @@ view model =
             (makeAdjustors
                 [ ( [ onClick Scramble ], [ text "Scramble" ] )
                 , ( [ onClick <| ChangeHeight 5 ], [ text "Height +" ] )
-                , ( [ onClick <| ChangeHeight -5 ], [ text "Height -" ] )
+                , ( [ onClick <| ChangeHeight -5
+                    , disabled <| model.height <= 10
+                    ]
+                  , [ text "Height -" ]
+                  )
                 , ( [ onClick <| ChangeWidth 5 ], [ text "Width +" ] )
-                , ( [ onClick <| ChangeWidth -5 ], [ text "Width -" ] )
+                , ( [ onClick <| ChangeWidth -5
+                    , disabled <| model.width <= 10
+                    ]
+                  , [ text "Width -" ]
+                  )
                 , ( [ onClick <| SetSquare
                     , disabled <| model.width == model.height
                     ]
